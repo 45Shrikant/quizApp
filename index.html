@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Quiz Application</title>
+
+    <style>
+
+        *{
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body{
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to right, #4facfe, #00f2fe);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .quiz-container{
+            background: white;
+            width: 500px;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0px 0px 15px rgba(0,0,0,0.2);
+        }
+
+        h2{
+            text-align: center;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        #timer{
+            text-align: right;
+            color: red;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .progress{
+            height: 10px;
+            background: #ddd;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .progress-bar{
+            height: 10px;
+            width: 0%;
+            background: #2563eb;
+            transition: 0.4s;
+        }
+
+        #question{
+            margin-bottom: 20px;
+            color: #222;
+        }
+
+        .option{
+            background: white;
+            border: 2px solid #2563eb;
+            margin: 10px 0;
+            padding: 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.3s;
+            color: #111;
+            font-size: 17px;
+            font-weight: 600;
+        }
+
+        .option:hover{
+            background: #dbeafe;
+        }
+
+        button{
+            width: 100%;
+            padding: 12px;
+            margin-top: 20px;
+            border: none;
+            background: #2563eb;
+            color: white;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        button:hover{
+            background: #1d4ed8;
+        }
+
+    </style>
+</head>
+
+<body>
+
+<div class="quiz-container">
+
+    <h2>🧠 Online Quiz Application</h2>
+
+    <div id="timer">Time Left: 15</div>
+
+    <div class="progress">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <h3 id="question"></h3>
+
+    <div id="options"></div>
+
+    <button onclick="nextQuestion()">Next Question</button>
+
+</div>
+
+<script>
+
+const quizData = [
+
+    {
+        question: "Which language is used for web apps?",
+        options: ["Python", "Java", "JavaScript", "C++"],
+        answer: "JavaScript"
+    },
+
+    {
+        question: "Which tag is used for largest heading in HTML?",
+        options: ["<h6>", "<head>", "<h1>", "<p>"],
+        answer: "<h1>"
+    },
+
+    {
+        question: "Which company developed React?",
+        options: ["Google", "Facebook", "Microsoft", "Amazon"],
+        answer: "Facebook"
+    },
+
+    {
+        question: "CSS stands for?",
+        options: [
+            "Computer Style Sheets",
+            "Cascading Style Sheets",
+            "Creative Style Sheets",
+            "Colorful Style Sheets"
+        ],
+        answer: "Cascading Style Sheets"
+    }
+
+];
+
+let currentQuestion = 0;
+let score = 0;
+let timeLeft = 15;
+let timer;
+let selectedAnswer = "";
+
+function loadQuestion(){
+
+    clearInterval(timer);
+
+    timeLeft = 15;
+
+    document.getElementById("timer").innerText =
+        "Time Left: " + timeLeft;
+
+    timer = setInterval(() => {
+
+        timeLeft--;
+
+        document.getElementById("timer").innerText =
+            "Time Left: " + timeLeft;
+
+        if(timeLeft <= 0){
+            clearInterval(timer);
+            nextQuestion();
+        }
+
+    },1000);
+
+    let q = quizData[currentQuestion];
+
+    document.getElementById("question").innerText =
+        q.question;
+
+    let optionsHTML = "";
+
+    q.options.forEach(option => {
+
+        optionsHTML += `
+            <div class="option" onclick="selectOption(this)">
+                ${option}
+            </div>
+        `;
+    });
+
+    document.getElementById("options").innerHTML =
+        optionsHTML;
+
+    selectedAnswer = "";
+
+    updateProgressBar();
+}
+
+function selectOption(element){
+
+    let options = document.querySelectorAll(".option");
+
+    options.forEach(opt => {
+        opt.style.background = "white";
+    });
+
+    element.style.background = "#93c5fd";
+
+    selectedAnswer = element.innerText;
+}
+
+function nextQuestion(){
+
+    if(selectedAnswer === quizData[currentQuestion].answer){
+        score++;
+    }
+
+    currentQuestion++;
+
+    if(currentQuestion < quizData.length){
+
+        loadQuestion();
+
+    }else{
+
+        clearInterval(timer);
+
+        document.querySelector(".quiz-container").innerHTML = `
+            <h2>🎉 Quiz Completed</h2>
+
+            <h1 style="text-align:center; margin-top:20px;">
+                Your Score: ${score}/${quizData.length}
+            </h1>
+
+            <h3 style="text-align:center; margin-top:15px; color:green;">
+                Thanks for Playing!
+            </h3>
+        `;
+    }
+}
+
+function updateProgressBar(){
+
+    let progress =
+        (currentQuestion / quizData.length) * 100;
+
+    document.getElementById("progressBar").style.width =
+        progress + "%";
+}
+
+loadQuestion();
+
+</script>
+
+</body>
+</html>
